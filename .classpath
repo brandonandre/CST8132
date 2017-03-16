@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="BankSystem/src"/>
+	<classpathentry kind="src" path="ExerciseOne/src"/>
+	<classpathentry kind="src" path="GuiComponents/src"/>
+	<classpathentry kind="src" path="GuitarProject/src"/>
+	<classpathentry kind="src" path="GuitarProject2/src"/>
+	<classpathentry kind="src" path="Hybrid2/src"/>
+	<classpathentry kind="src" path="Lab1/src"/>
+	<classpathentry kind="src" path="StreetSimulation/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="BankSystem/bin"/>
+</classpath>
