@@ -205,7 +205,7 @@ public class GuessGameFrame extends JFrame {
 
 				// Change the background depending if you are closer (warmer) or
 				// far (colder).
-				background = (currentDistance <= lastDistance) ? Color.RED : Color.BLUE;
+				background = (currentDistance >= lastDistance) ? Color.RED : Color.BLUE;
 
 				// Repaint the background.
 				paint(getGraphics());
@@ -214,7 +214,7 @@ public class GuessGameFrame extends JFrame {
 
 				// Change the background depending if you are closer (warmer) or
 				// far (colder).
-				background = (currentDistance <= lastDistance) ? Color.RED : Color.BLUE;
+				background = (currentDistance >= lastDistance) ? Color.RED : Color.BLUE;
 
 				// Repaint the background.
 				paint(getGraphics());
@@ -233,12 +233,6 @@ public class GuessGameFrame extends JFrame {
 			// The current guess is how close you are from your guess compared
 			// to random number.
 			currentDistance = Math.abs(number - guess);
-
-			System.out.println("Total guesses: " + guessCount);
-			System.out.println("Current Distance: " + currentDistance);
-			System.out.println("Last Distance: " + lastDistance);
-			System.out.println("Random Number: " + number);
-			System.out.println("Guessed: " + guess);
 
 			// guess is too high
 			if (guess > number) {

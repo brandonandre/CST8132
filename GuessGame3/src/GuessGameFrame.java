@@ -242,12 +242,6 @@ public class GuessGameFrame extends JFrame {
 			// to random number.
 			currentDistance = Math.abs(number - guess);
 
-			System.out.println("Total guesses: " + guessCount);
-			System.out.println("Current Distance: " + currentDistance);
-			System.out.println("Last Distance: " + lastDistance);
-			System.out.println("Random Number: " + number);
-			System.out.println("Guessed: " + guess);
-
 			// guess is too high
 			if (guess > number) {
 				messageJLabel.setText("Too High. Try a lower number.");
