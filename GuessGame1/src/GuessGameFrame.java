@@ -196,7 +196,7 @@ public class GuessGameFrame extends JFrame {
 
 				// Change the background depending if you are closer (warmer) or
 				// far (colder).
-				background = (currentDistance <= lastDistance) ? Color.RED : Color.BLUE;
+				background = (currentDistance >= lastDistance) ? Color.RED : Color.BLUE;
 
 				// Repaint the background.
 				paint(getGraphics());
@@ -205,7 +205,7 @@ public class GuessGameFrame extends JFrame {
 
 				// Change the background depending if you are closer (warmer) or
 				// far (colder).
-				background = (currentDistance <= lastDistance) ? Color.RED : Color.BLUE;
+				background = (currentDistance >= lastDistance) ? Color.RED : Color.BLUE;
 
 				// Repaint the background.
 				paint(getGraphics());
