@@ -1,4 +1,4 @@
-// NumberNotFoundException.java
+// DuplicateValueException.java
 public class DuplicateValueException extends Exception 
 {
    // no-argument constructor specifies default error message
