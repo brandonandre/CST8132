@@ -50,21 +50,27 @@ public class ArrayAccess extends JFrame
                   messages in error message dialogs. */
             	
             	try {
-            		//Convert the String value into an integer value, store it in the array
-            		array[index] = Integer.parseInt(inputField.getText());
             		
-            		//Increment the array index, to store the next number.
+            		int num = Integer.parseInt(inputField.getText());
+            		
+            		for(int i : array){
+            			if (num == array[i]){
+            				throw new DuplicateValueException();
+            			}
+            		}
+            		
+            		array[index] = num;
             		index++;
-            	} catch (NumberFormatException e){
-            		//Handle error when it's not an integer value.
+            	} catch (NumberFormatException ex){
             		JOptionPane.showMessageDialog(null, "Please enter only integer values.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            	} catch (ArrayIndexOutOfBoundsException e){
-            		//Handle error when array is given more than 10 values.
+            	} catch (ArrayIndexOutOfBoundsException ex){
             		JOptionPane.showMessageDialog(null, "Array may contain only 10 elements", "Array Full", JOptionPane.ERROR_MESSAGE);
+            	} catch (DuplicateValueException ex){
+            		JOptionPane.showMessageDialog(null, ex.getMessage(), "Duplicate Value Error", JOptionPane.ERROR_MESSAGE);
             	}
+            	
                
-            	//reset text field
-                inputField.setText( "" );
+               inputField.setText( "" );
             } // end method actionPerformed
          } // end anonymous inner class
       ); // end call to addActionListener
@@ -93,41 +99,27 @@ public class ArrayAccess extends JFrame
             	
             	try {
             		
-            		//Determines if a value was found when looping through the array.
             		boolean found = false;
-            		
-            		//The message that will be set to the outputField.
             		result = "";
-            		
-            		//Convert the String value to a integer taken from retriveField1.
             		num = Integer.parseInt(retrieveField1.getText());
             		
-            		//Loop through every value in the array, checking for a match.
             		for(int i = 0; i < array.length; i++){
             			if(num == array[i]) {
-            				//Match found, set found to true.
             				found = true;
-            				
-            				//Append it to the result string.
             				result = result + i + " ";
             			}
             		}
             		
-            		//If nothing is found, throw an exception.
-            		if (!found){
-             			//Could not find the number.
-            			throw new NumberNotFoundException();           			
-            		} 
+            		if (found){
+            			outputField.setText("The value "+ num +" were found at the following indexes: "+result);
+            		} else {
+            			throw new NumberNotFoundException();
+            		}
             		
-            		//This line will not be executed if the values are not found.
-            		outputField.setText("The value "+ num +" were found at the following indexes: "+result);
-            		
-            	} catch (NumberFormatException e){
-            		//Handle error when it's not an integer value.
+            	} catch (NumberFormatException numE){
             		JOptionPane.showMessageDialog(null, "Please enter only integer values.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            	} catch (NumberNotFoundException e){
-            		//Handle error when number is not found in the array.
-            		JOptionPane.showMessageDialog(null, e.getMessage(), "Not Found", JOptionPane.ERROR_MESSAGE);
+            	} catch (NumberNotFoundException naE){
+            		JOptionPane.showMessageDialog(null, "Number not found in array.", "Not Found", JOptionPane.ERROR_MESSAGE);
             	}
                 
                retrieveField1.setText( "" );
@@ -158,19 +150,12 @@ public class ArrayAccess extends JFrame
                   messages in error message dialogs. */
             	
             	try {
-            		//Convert the string to an integer value from retriveField2.
             		int indexNumber = Integer.parseInt(retrieveField2.getText());
-            		
-            		//Get the value of that index in the array.
             		int indexValue = array[indexNumber];
-            		
-            		//Output the value to the outputField.
             		outputField.setText("At an index of "+ indexNumber +" the value is " + indexValue);
-            	} catch (NumberFormatException e){
-            		//Handle error when it's not an integer value.
+            	} catch (NumberFormatException numE){
             		JOptionPane.showMessageDialog(null, "Please enter only integer values.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            	} catch (ArrayIndexOutOfBoundsException e){
-            		//Handle error when the index is not within the range. (0-9)
+            	} catch (ArrayIndexOutOfBoundsException arrayE){
             		JOptionPane.showMessageDialog(null, "Index Not Found.", "Index Out of Bounds", JOptionPane.ERROR_MESSAGE);
             	}
                
