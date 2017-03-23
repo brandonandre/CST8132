@@ -146,6 +146,7 @@ public class GuessGameFrame extends JFrame {
 		
 		// Generate a random number from 1 to 1000. (Cannot be zero!)
 		number = generator.nextInt(999) + 1;
+		System.out.println(number);
 		
 		//Reset the guess counter.
 		guessJLabel.setText("You have guessed "+ guessCount + " times");
@@ -209,7 +210,7 @@ public class GuessGameFrame extends JFrame {
 
 				// Repaint the background.
 				paint(getGraphics());
-			} else {
+			} else if (guess < number) {
 				messageJLabel.setText("Too Low. Try a higher number.");
 
 				// Change the background depending if you are closer (warmer) or
@@ -218,7 +219,16 @@ public class GuessGameFrame extends JFrame {
 
 				// Repaint the background.
 				paint(getGraphics());
-			}
+			} else {
+        
+        messageJLabel.setText("Correct!");
+
+         // Reset the background to gray.
+         background = Color.LIGHT_GRAY;
+
+         paint(getGraphics());
+       
+     }
 		} // end if
 		else {
 			/*
