@@ -8,7 +8,7 @@ public class ArrayAccessTest
    {
       ArrayAccess application = new ArrayAccess();
       application.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-      application.setSize( 400, 200 );
+      application.setSize( 500, 200 );
       application.setVisible( true );
    }
 } // end class ArrayAccessTest

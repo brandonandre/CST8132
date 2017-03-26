@@ -64,7 +64,7 @@ public class ArrayAccess extends JFrame
             	}
                
             	//reset text field
-                inputField.setText( "" );
+              inputField.setText( "" );
             } // end method actionPerformed
          } // end anonymous inner class
       ); // end call to addActionListener
@@ -91,44 +91,46 @@ public class ArrayAccess extends JFrame
                   NumberNotFoundException), and display appropriate messages 
                   in error message dialogs. */
             	
-            	try {
-            		
-            		//Determines if a value was found when looping through the array.
-            		boolean found = false;
-            		
-            		//The message that will be set to the outputField.
-            		result = "";
-            		
-            		//Convert the String value to a integer taken from retriveField1.
-            		num = Integer.parseInt(retrieveField1.getText());
-            		
-            		//Loop through every value in the array, checking for a match.
-            		for(int i = 0; i < array.length; i++){
-            			if(num == array[i]) {
-            				//Match found, set found to true.
-            				found = true;
-            				
-            				//Append it to the result string.
-            				result = result + i + " ";
-            			}
-            		}
-            		
-            		//If nothing is found, throw an exception.
-            		if (!found){
-             			//Could not find the number.
-            			throw new NumberNotFoundException();           			
-            		} 
-            		
-            		//This line will not be executed if the values are not found.
-            		outputField.setText("The value "+ num +" were found at the following indexes: "+result);
-            		
-            	} catch (NumberFormatException e){
-            		//Handle error when it's not an integer value.
-            		JOptionPane.showMessageDialog(null, "Please enter only integer values.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            	} catch (NumberNotFoundException e){
-            		//Handle error when number is not found in the array.
-            		JOptionPane.showMessageDialog(null, e.getMessage(), "Not Found", JOptionPane.ERROR_MESSAGE);
-            	}
+            try {
+
+              // Determines if a value was found when looping through the array.
+              boolean found = false;
+
+              // The message that will be set to the outputField.
+              result = "";
+
+              // Convert the String value to a integer taken from retriveField1.
+              num = Integer.parseInt(retrieveField1.getText());
+
+              // Loop through every value in the array, checking for a match.
+
+              for (int i = 0; i < index; i++) {
+                if (num == array[i]) {
+                  // Match found, set found to true.
+                  found = true;
+
+                  // Append it to the result string.
+                  result = result + i + " ";
+                }
+              }
+
+              // If nothing is found, throw an exception.
+              if (!found) {
+                // Could not find the number.
+                throw new NumberNotFoundException();
+              }
+
+              // This line will not be executed if the values are not found.
+              outputField.setText("The value " + num + " were found at the following indexes: " + result);
+
+            } catch (NumberFormatException e) {
+              // Handle error when it's not an integer value.
+              JOptionPane.showMessageDialog(null, "Please enter only integer values.", "Invalid Input",
+                  JOptionPane.ERROR_MESSAGE);
+            } catch (NumberNotFoundException e) {
+              // Handle error when number is not found in the array.
+              JOptionPane.showMessageDialog(null, e.getMessage(), "Not Found", JOptionPane.ERROR_MESSAGE);
+            }
                 
                retrieveField1.setText( "" );
             } // end method actionPerformed
@@ -161,11 +163,16 @@ public class ArrayAccess extends JFrame
             		//Convert the string to an integer value from retriveField2.
             		int indexNumber = Integer.parseInt(retrieveField2.getText());
             		
-            		//Get the value of that index in the array.
-            		int indexValue = array[indexNumber];
+            		if (indexNumber < index){
+            		  //Get the value of that index in the array.
+            		  int indexValue = array[indexNumber];
+            		  
+            		  //Output the value to the outputField.
+            		  outputField.setText("At an index of "+ indexNumber +" the value is " + indexValue);
+            		} else {
+            		  throw new ArrayIndexOutOfBoundsException();
+            		}
             		
-            		//Output the value to the outputField.
-            		outputField.setText("At an index of "+ indexNumber +" the value is " + indexValue);
             	} catch (NumberFormatException e){
             		//Handle error when it's not an integer value.
             		JOptionPane.showMessageDialog(null, "Please enter only integer values.", "Invalid Input", JOptionPane.ERROR_MESSAGE);

@@ -295,8 +295,6 @@ public class GuessGameFrame extends JFrame {
 			{
 				messageJLabel.setText("Correct!");
 				
-				System.out.println("CORRECT!");
-				
 				correctNumberJLabel.setText("The answer is " + number);
 				correctNumberJLabel.setVisible(true);
 
