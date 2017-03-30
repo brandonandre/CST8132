@@ -2,43 +2,64 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
+//TODO: Enhance GUI to include a save and read feature.
+//TODO: Write a test plan of everything that could possibly go wrong.
+//TODO: Add an marker interface Serializable. 
+//TODO: Impliment exception handling (IO execeptions)
+
 /**
- * Generates vehicles to go on the street, and then randomly simulates the
- * vehicles that are on the street. and prints out the statics of the vehicles.
+ * Simulates the vehicles on the street. Creates the user interface in order
+ * to interact and add more vehicles to the street and to run the simulation
+ * process.
  * 
- * @see Vehicle
  * @author Brandon Andre
- *
  */
 public class Street extends JFrame {
+
   /**
-   * Random object used to generate the random integers to create a random
-   * sequence of events among the vehicles.
+   * Generates a random number in order to speed up a vehicle.
    */
   private static final Random randomNumbers = new Random();
 
   /**
-   * Array List containing all the vehicles used in the simulation.
+   * Array list used to store a unfixed size of vehicles.
    */
   private ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
-
-  private JButton newBicycleButton;
-  private JButton newCarButton;
-  private JButton doneButton;
-  private JTextField response;
+  
+  /**
+   * Iterator used to go though all the vehicles. 
+   */
+  private Iterator<Vehicle> iterator; 
 
   /**
-   * Sole Constructor Used to create the vehicles for the simulation, creating
-   * an equal amount of bicycles and cars.
-   * 
-   * @see Car, Bicycle
+   * Bicycle button which is used to generate a new bicycle on to the street.
    */
+  private JButton newBicycleButton;
+  
+  /**
+   * Car button which is used to generate a new car on to the street.
+   */
+  private JButton newCarButton;
+  
+  /**
+   * Done button to start the simulation process.
+   */
+  private JButton doneButton;
+  
+  /**
+   * Response field to show what is happening.
+   */
+  private JTextField response;
+
   public Street() {
     super("Street Simulation");
 
@@ -95,25 +116,53 @@ public class Street extends JFrame {
 
   }
 
-  /**
-   * Simulates all the vehicles on the street, doing 6 increments of simulation.
-   * With each increment it will list out all the vehicles that are on the
-   * street, the current speed of the vehicle, the noises all the vehicles are
-   * making, and randomly push the petal of one of the vehicles.
-   */
+
   public void simulate() {
 
-    
+    // First we need to run though all the vehicles in the system.
+	// From slowest to fastest.
+	  
+	System.out.println("Update on the street: \n");
+	
+	Collections.sort(vehicles, new VechicleComparator());
+	iterator = vehicles.iterator();
+	
+	while (iterator.hasNext()) {
+		Vehicle current = iterator.next();
+		System.out.println(current + " has speed " + current.getSpeed());
+	}
+	
+	// Now shuffle the order and make the noise.
+	
+	Collections.shuffle(vehicles);
+	iterator = vehicles.iterator();
+	
+	while (iterator.hasNext()) {
+		Vehicle current = iterator.next();
+		System.out.println(current + ":" + current.noise());
+	}
+	
+	int randomPush = randomNumbers.nextInt(vehicles.size());
+    System.out.println("The pedal of " + vehicles.get(randomPush).toString() + " was pushed \n");
+    vehicles.get(randomPush).pushPedal();
     
   }
+  
+  public class VechicleComparator implements Comparator<Vehicle> {
 
-  /**
-   * Creates an instance of the Street class and run the simulation. The first
-   * thing that is ran.
-   * 
-   * @param args
-   *          unused.
-   */
+	@Override
+	public int compare(Vehicle v1, Vehicle v2) {
+		if(v1.getSpeed() < v2.getSpeed()){
+			return -1;
+		} else if(v1.getSpeed() > v2.getSpeed()){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	  
+  }
+
   public static void main(String[] args) {
     // Declare and create an instance of this class (Street).
     Street thestreet = new Street();
