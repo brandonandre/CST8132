@@ -1,6 +1,14 @@
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,7 +16,9 @@ import java.util.Iterator;
 import java.util.Random;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 //TODO: Enhance GUI to include a save and read feature.
@@ -24,7 +34,7 @@ import javax.swing.JTextField;
  * @author Brandon Andre
  */
 public class Street extends JFrame {
-
+	
   /**
    * Generates a random number in order to speed up a vehicle.
    */
@@ -59,11 +69,14 @@ public class Street extends JFrame {
    * Response field to show what is happening.
    */
   private JTextField response;
+  
+  private JButton save;
+  private JButton load; 
 
   public Street() {
     super("Street Simulation");
 
-    response = new JTextField(40);
+    response = new JTextField(50);
     
     // Create the add new Bicycle
     newBicycleButton = new JButton("Add Bicycle");
@@ -102,7 +115,35 @@ public class Street extends JFrame {
       }
 
     });
-   
+    
+    save = new JButton("Save");
+    save.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			
+		}
+    	
+    });
+    
+    
+    load = new JButton("Load");
+    load.addActionListener(new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Path path = browseFiles();
+			
+			if (Files.exists(path)){
+				
+			} else {
+				JOptionPane.showMessageDialog(null, "The path given: '"+path.toString()+"' does not exist. Please enter a valid location.", "Location not found", JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}
+    	
+    });
     
     FlowLayout layout = new FlowLayout();
 
@@ -113,9 +154,11 @@ public class Street extends JFrame {
     add(newCarButton);
     add(doneButton);
     add(response);
+   
+    add(save);
+    add(load);
 
   }
-
 
   public void simulate() {
 
@@ -161,6 +204,18 @@ public class Street extends JFrame {
 		}
 	}
 	  
+  }
+  
+  private Path browseFiles(){
+	  JFileChooser file = new JFileChooser();
+	  file.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	  
+	  int result = file.showOpenDialog(this);
+	  
+	  if (result != JFileChooser.CANCEL_OPTION)
+		  return file.getSelectedFile().toPath();
+	  
+	  return null; //TODO transfer this to another path name.
   }
 
   public static void main(String[] args) {
