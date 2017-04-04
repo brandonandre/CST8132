@@ -5,7 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.EOFException;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -21,10 +27,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-//TODO: Enhance GUI to include a save and read feature.
-//TODO: Write a test plan of everything that could possibly go wrong.
-//TODO: Add an marker interface Serializable. 
-//TODO: Impliment exception handling (IO execeptions)
+//TODO Test plan! Test every possible case...
+//TODO Clean up code. Look up better ways to handle specific cases...
+//TODO Javadoc it...
 
 /**
  * Simulates the vehicles on the street. Creates the user interface in order
@@ -69,6 +74,9 @@ public class Street extends JFrame {
    * Response field to show what is happening.
    */
   private JTextField response;
+  
+  private static ObjectInputStream input;
+  private static ObjectOutputStream output; 
   
   private JButton save;
   private JButton load; 
@@ -122,7 +130,51 @@ public class Street extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
+			//Select the directory you would like to save it to
+			Path path = browseFiles(false);
 			
+			if (path != null){
+				if (Files.exists(path)){
+					
+					boolean fail = false;
+					
+					// Open the file to save to it
+					try {
+						output = new ObjectOutputStream(Files.newOutputStream(path));
+				    }
+				    catch (IOException ioException){
+				    	errorMessage("Reading Error", "Could not read the file you specified. Please try again.");
+				    	fail = true;
+				    } 
+					
+					//Loop through each vehicle object and add it to the file.
+					iterator = vehicles.iterator();
+					try {
+						while (iterator.hasNext()){
+							output.writeObject(iterator.next());
+						}
+					} catch (IOException e1) {
+						errorMessage("Writing to file Error", "Could not write to the specified file");
+						fail = true;
+					} 
+					
+					if (!fail){
+						response.setText("Saved " + vehicles.size() + " vehicles to the file " + path);
+					}
+					
+					// Close the file being used.
+				    try{
+				    	if (input != null)
+				    		input.close();
+				      	} 
+				    catch (IOException ioException){
+				    	errorMessage("Could not close file", "The file specified could not be closed...");
+				    } 
+					
+				} else {
+					errorMessage("Invalid Path", "Please just select the directory you would like to save to.");
+				}
+			}
 		}
     	
     });
@@ -133,14 +185,58 @@ public class Street extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Path path = browseFiles();
+			Path path = browseFiles(true);
 			
-			if (Files.exists(path)){
-				
-			} else {
-				JOptionPane.showMessageDialog(null, "The path given: '"+path.toString()+"' does not exist. Please enter a valid location.", "Location not found", JOptionPane.ERROR_MESSAGE);
-			}
-			
+			//Check if the user has canceled the dialog. 
+			if (path != null){ 
+				if (Files.exists(path)){
+					//Open the file...
+					try {
+						input = new ObjectInputStream(Files.newInputStream(path));
+					} catch (IOException e1) {
+						errorMessage("Reading Error", "Could not read the file you specified. Please try again.");
+					}
+					
+					//Read the file...
+					//Create a temporary arrayList in case an error arises... 
+					ArrayList<Vehicle> temp = new ArrayList<Vehicle>();
+					boolean completed = false;
+					try { 
+						while (true) {
+							// Dump the file!
+							
+							Vehicle vehicle = (Vehicle) input.readObject();
+							temp.add(vehicle);
+						}
+					} catch (EOFException fileEndException) {
+						completed = true;
+					} catch (ClassNotFoundException e1) {
+						errorMessage("Invalid file", "This file does not contain the correct information... Try one generated from this program.");
+					} catch (IOException e1) {
+						errorMessage("Reading Error", "Could not read the file you specified. Please try again.");
+					} finally {
+						if (completed){
+							//Erase the vehicles array list with the temp one created.
+							vehicles = temp;
+							response.setText("Loaded " + vehicles.size() + " vehicles from the file " + path);
+						}
+					}
+					
+					//Close out the file...
+				    try{
+				    	if (input != null)
+				    		input.close();
+				      	} 
+				    catch (IOException ioException){
+				    	//TODO Handle this error better.
+				        System.err.println("Error closing file. Terminating program...");
+				        System.exit(1);
+				    } 
+					
+				} else {
+					errorMessage("Location not found", "The path given: '"+path.toString()+"' does not exist. Please enter a valid location.");
+				}
+			} 
 		}
     	
     });
@@ -164,31 +260,35 @@ public class Street extends JFrame {
 
     // First we need to run though all the vehicles in the system.
 	// From slowest to fastest.
-	  
-	System.out.println("Update on the street: \n");
 	
-	Collections.sort(vehicles, new VechicleComparator());
-	iterator = vehicles.iterator();
-	
-	while (iterator.hasNext()) {
-		Vehicle current = iterator.next();
-		System.out.println(current + " has speed " + current.getSpeed());
+	// Check if there is any vehicles on the street...
+	if (!vehicles.isEmpty()){
+		System.out.println("Update on the street: \n");
+		
+		Collections.sort(vehicles, new VechicleComparator());
+		iterator = vehicles.iterator();
+		
+		while (iterator.hasNext()) {
+			Vehicle current = iterator.next();
+			System.out.println(current + " has speed " + current.getSpeed());
+		}
+		
+		// Now shuffle the order and make the noise.
+		
+		Collections.shuffle(vehicles);
+		iterator = vehicles.iterator();
+		
+		while (iterator.hasNext()) {
+			Vehicle current = iterator.next();
+			System.out.println(current + ":" + current.noise());
+		}
+		
+		int randomPush = randomNumbers.nextInt(vehicles.size());
+	    System.out.println("The pedal of " + vehicles.get(randomPush).toString() + " was pushed \n");
+	    vehicles.get(randomPush).pushPedal();
+	} else {
+		errorMessage("Empty Street", "Nothing to simulate... Try creating some objects!");
 	}
-	
-	// Now shuffle the order and make the noise.
-	
-	Collections.shuffle(vehicles);
-	iterator = vehicles.iterator();
-	
-	while (iterator.hasNext()) {
-		Vehicle current = iterator.next();
-		System.out.println(current + ":" + current.noise());
-	}
-	
-	int randomPush = randomNumbers.nextInt(vehicles.size());
-    System.out.println("The pedal of " + vehicles.get(randomPush).toString() + " was pushed \n");
-    vehicles.get(randomPush).pushPedal();
-    
   }
   
   public class VechicleComparator implements Comparator<Vehicle> {
@@ -206,16 +306,25 @@ public class Street extends JFrame {
 	  
   }
   
-  private Path browseFiles(){
+  private Path browseFiles(boolean open){
 	  JFileChooser file = new JFileChooser();
+	  int result;
 	  file.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	  
-	  int result = file.showOpenDialog(this);
+	  if (open){
+		  result = file.showOpenDialog(this);
+	  } else {
+		  result = file.showSaveDialog(this);
+	  }
 	  
 	  if (result != JFileChooser.CANCEL_OPTION)
 		  return file.getSelectedFile().toPath();
 	  
-	  return null; //TODO transfer this to another path name.
+	  return null; 
+  }
+  
+  private void errorMessage(String title, String message){
+	  JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
   }
 
   public static void main(String[] args) {

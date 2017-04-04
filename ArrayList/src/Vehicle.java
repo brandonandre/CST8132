@@ -1,10 +1,11 @@
+import java.io.Serializable;
 
 /**
  * The abstract vehicle class used for the different types of vehicles.
  * @author Brandon Andre
  *
  */
-public abstract class Vehicle {
+public abstract class Vehicle implements Serializable {
 
   /**
    * The amount of wheels on the vehicle.
