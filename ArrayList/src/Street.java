@@ -1,24 +1,17 @@
-import java.awt.Color;
+
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.EOFException;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -41,6 +34,11 @@ import javax.swing.JTextField;
 public class Street extends JFrame {
 	
   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6011533959672949005L;
+
+/**
    * Generates a random number in order to speed up a vehicle.
    */
   private static final Random randomNumbers = new Random();
