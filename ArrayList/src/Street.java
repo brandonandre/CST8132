@@ -20,25 +20,21 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-//TODO Test plan! Test every possible case...
-//TODO Clean up code. Look up better ways to handle specific cases...
-//TODO Javadoc it...
-
 /**
- * Simulates the vehicles on the street. Creates the user interface in order
- * to interact and add more vehicles to the street and to run the simulation
- * process.
+ * Simulates the vehicles on the street. Creates the user interface in order to interact and add
+ * more vehicles to the street and to run the simulation process.
  * 
  * @author Brandon Andre
  */
 public class Street extends JFrame {
-	
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6011533959672949005L;
 
-/**
+  /**
+   * Version number for the serial. If I update it in the future I can see if
+   * the vehicle is the same version. 
+   */
+  private static final long serialVersionUID = -6011533959672949005L;
+
+  /**
    * Generates a random number in order to speed up a vehicle.
    */
   private static final Random randomNumbers = new Random();
@@ -47,43 +43,58 @@ public class Street extends JFrame {
    * Array list used to store a unfixed size of vehicles.
    */
   private ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
-  
+
   /**
-   * Iterator used to go though all the vehicles. 
+   * Iterator used to go though all the vehicles.
    */
-  private Iterator<Vehicle> iterator; 
+  private Iterator<Vehicle> iterator;
 
   /**
    * Bicycle button which is used to generate a new bicycle on to the street.
    */
   private JButton newBicycleButton;
-  
+
   /**
    * Car button which is used to generate a new car on to the street.
    */
   private JButton newCarButton;
-  
+
   /**
    * Done button to start the simulation process.
    */
   private JButton doneButton;
-  
+
   /**
    * Response field to show what is happening.
    */
   private JTextField response;
-  
+
+  /**
+   * Input stream for the loading feature. Load all the vehicle objects into our program.
+   */
   private static ObjectInputStream input;
-  private static ObjectOutputStream output; 
-  
+
+  /**
+   * Output stream for the saving feature. Save all of the vehicles into a specific file.
+   */
+  private static ObjectOutputStream output;
+
+  /**
+   * Save button used for the save feature.
+   */
   private JButton save;
-  private JButton load; 
+
+  /**
+   * Load button used for the load feature.
+   */
+  private JButton load;
 
   public Street() {
+    // Set the title of the window frame.
     super("Street Simulation");
 
     response = new JTextField(50);
-    
+
     // Create the add new Bicycle
     newBicycleButton = new JButton("Add Bicycle");
 
@@ -91,245 +102,280 @@ public class Street extends JFrame {
 
       @Override
       public void actionPerformed(ActionEvent e) {
+        // Add a new bicycle to the vehicle array list.
         Vehicle bike = new Bicycle();
         vehicles.add(bike);
         response.setText(bike + " was added to the Street");
       }
 
     });
-    
+
     newCarButton = new JButton("Add Car");
-    
+
     newCarButton.addActionListener(new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent e) {
+        // Add a new car to the vehicle array list.
         Vehicle car = new Car();
         vehicles.add(car);
         response.setText(car + " was added to the Street");
       }
 
     });
-    
+
     doneButton = new JButton("Done");
-    
+
     doneButton.addActionListener(new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent e) {
+        // Simulate the street once.
         simulate();
       }
 
     });
-    
+
     save = new JButton("Save");
     save.addActionListener(new ActionListener() {
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
+      @Override
+      public void actionPerformed(ActionEvent e) {
 
-			//Select the directory you would like to save it to
-			Path path = browseFiles(false);
-			
-			if (path != null){
-				if (Files.exists(path)){
-					
-					boolean fail = false;
-					
-					// Open the file to save to it
-					try {
-						output = new ObjectOutputStream(Files.newOutputStream(path));
-				    }
-				    catch (IOException ioException){
-				    	errorMessage("Reading Error", "Could not read the file you specified. Please try again.");
-				    	fail = true;
-				    } 
-					
-					//Loop through each vehicle object and add it to the file.
-					iterator = vehicles.iterator();
-					try {
-						while (iterator.hasNext()){
-							output.writeObject(iterator.next());
-						}
-					} catch (IOException e1) {
-						errorMessage("Writing to file Error", "Could not write to the specified file");
-						fail = true;
-					} 
-					
-					if (!fail){
-						response.setText("Saved " + vehicles.size() + " vehicles to the file " + path);
-					}
-					
-					// Close the file being used.
-				    try{
-				    	if (input != null)
-				    		input.close();
-				      	} 
-				    catch (IOException ioException){
-				    	errorMessage("Could not close file", "The file specified could not be closed...");
-				    } 
-					
-				} else {
-					errorMessage("Invalid Path", "Please just select the directory you would like to save to.");
-				}
-			}
-		}
-    	
+        // Select the directory you would like to save it to
+        Path path = browseFiles(false);
+
+        // Check if the user canceled the browse dialog...
+        if (path != null) {
+          
+          // Check if the file the user picked actually exists. 
+          if (Files.exists(path)) {
+
+            boolean fail = false;
+
+            // Open the file to save to it
+            try {
+              output = new ObjectOutputStream(Files.newOutputStream(path));
+              iterator = vehicles.iterator();
+
+              // For every object in our ArrayList, write it to a file.
+              while (iterator.hasNext()) {
+                output.writeObject(iterator.next());
+              }
+
+              if (input != null) {
+                input.close();
+              }
+
+            } catch (IOException ioException) {
+              errorMessage("Reading Error",
+                  "Could not read the file you specified. Please try again.");
+              fail = true;
+            }
+
+            // If sucessful, tell the user that we saved it to the specificed file.
+            if (!fail) {
+              response.setText("Saved " + vehicles.size() + " vehicles to the file " + path);
+            }
+
+
+          } else {
+            errorMessage("Invalid Path",
+                "Please just select the directory you would like to save to.");
+          }
+        }
+      }
+
     });
-    
-    
+
+
     load = new JButton("Load");
     load.addActionListener(new ActionListener() {
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Path path = browseFiles(true);
-			
-			//Check if the user has canceled the dialog. 
-			if (path != null){ 
-				if (Files.exists(path)){
-					//Open the file...
-					try {
-						input = new ObjectInputStream(Files.newInputStream(path));
-					} catch (IOException e1) {
-						errorMessage("Reading Error", "Could not read the file you specified. Please try again.");
-					}
-					
-					//Read the file...
-					//Create a temporary arrayList in case an error arises... 
-					ArrayList<Vehicle> temp = new ArrayList<Vehicle>();
-					boolean completed = false;
-					try { 
-						while (true) {
-							// Dump the file!
-							
-							Vehicle vehicle = (Vehicle) input.readObject();
-							temp.add(vehicle);
-						}
-					} catch (EOFException fileEndException) {
-						completed = true;
-					} catch (ClassNotFoundException e1) {
-						errorMessage("Invalid file", "This file does not contain the correct information... Try one generated from this program.");
-					} catch (IOException e1) {
-						errorMessage("Reading Error", "Could not read the file you specified. Please try again.");
-					} finally {
-						if (completed){
-							//Erase the vehicles array list with the temp one created.
-							vehicles = temp;
-							response.setText("Loaded " + vehicles.size() + " vehicles from the file " + path);
-						}
-					}
-					
-					//Close out the file...
-				    try{
-				    	if (input != null)
-				    		input.close();
-				      	} 
-				    catch (IOException ioException){
-				    	//TODO Handle this error better.
-				        System.err.println("Error closing file. Terminating program...");
-				        System.exit(1);
-				    } 
-					
-				} else {
-					errorMessage("Location not found", "The path given: '"+path.toString()+"' does not exist. Please enter a valid location.");
-				}
-			} 
-		}
-    	
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        Path path = browseFiles(true);
+
+        // Check if the user has canceled the dialog.
+        if (path != null) {
+          
+          // Check if the file exists.
+          if (Files.exists(path)) {
+            
+            // Open the file...
+
+            // Create a temp array so if something goes wrong it does not overwrite the main vehicle
+            // array.
+            ArrayList<Vehicle> temp = new ArrayList<Vehicle>();
+            boolean completed = false;
+
+            try {
+              input = new ObjectInputStream(Files.newInputStream(path));
+
+              // Keep looping through all the data until we reach the end.
+              while (true) {
+                Vehicle vehicle = (Vehicle) input.readObject();
+                temp.add(vehicle);
+              }
+
+            } catch (EOFException e1) {
+              // Reached the end of the file exception.
+              completed = true;
+            } catch (IOException e1) {
+
+              // Error reading the exception.
+              errorMessage("Reading Error",
+                  "Could not read the file you specified. Please try again.");
+              e1.printStackTrace();
+
+            } catch (ClassNotFoundException e1) {
+
+              // Invalid files, there is no vehicle objects in this.
+              errorMessage("Invalid file",
+                  "This file does not contain the correct information... Try one generated from this program.");
+            } finally {
+
+              // Check completed successfully.
+              if (completed) {
+                // Erase the vehicles array list with the temp one created.
+                vehicles = temp;
+                response.setText("Loaded " + vehicles.size() + " vehicles from the file " + path);
+              }
+            }
+
+            // Close the input stream to prevent memory leaks.
+            try {
+              if (input != null)
+                input.close();
+            } catch (IOException ioException) {
+              System.err.println("Error closing file. Terminating program...");
+              System.exit(1);
+            }
+
+          } else {
+            errorMessage("Location not found", "The path given: '" + path.toString()
+                + "' does not exist. Please enter a valid location.");
+          }
+        }
+      }
+
     });
-    
+
     FlowLayout layout = new FlowLayout();
 
     // Set the layout container to be added to the frame.
     setLayout(layout);
-    
+
+    // Add all the GUI elements to the layout manager.
     add(newBicycleButton);
     add(newCarButton);
     add(doneButton);
     add(response);
-   
     add(save);
     add(load);
 
   }
 
+  /**
+   * Used to simulate all the vehicles on the street.
+   */
   public void simulate() {
 
     // First we need to run though all the vehicles in the system.
-	// From slowest to fastest.
-	
-	// Check if there is any vehicles on the street...
-	if (!vehicles.isEmpty()){
-		System.out.println("Update on the street: \n");
-		
-		Collections.sort(vehicles, new VechicleComparator());
-		iterator = vehicles.iterator();
-		
-		while (iterator.hasNext()) {
-			Vehicle current = iterator.next();
-			System.out.println(current + " has speed " + current.getSpeed());
-		}
-		
-		// Now shuffle the order and make the noise.
-		
-		Collections.shuffle(vehicles);
-		iterator = vehicles.iterator();
-		
-		while (iterator.hasNext()) {
-			Vehicle current = iterator.next();
-			System.out.println(current + ":" + current.noise());
-		}
-		
-		int randomPush = randomNumbers.nextInt(vehicles.size());
-	    System.out.println("The pedal of " + vehicles.get(randomPush).toString() + " was pushed \n");
-	    vehicles.get(randomPush).pushPedal();
-	} else {
-		errorMessage("Empty Street", "Nothing to simulate... Try creating some objects!");
-	}
+    // From slowest to fastest.
+
+    // Check if there is any vehicles on the street...
+    if (!vehicles.isEmpty()) {
+      System.out.println("Update on the street: \n");
+
+      // Sort it by speed. Using our custom comparator.
+      Collections.sort(vehicles, new VechicleComparator());
+      iterator = vehicles.iterator();
+
+      while (iterator.hasNext()) {
+        Vehicle current = iterator.next();
+        System.out.println(current + " has speed " + current.getSpeed());
+      }
+
+      // Now shuffle the order and make the noise.
+      Collections.shuffle(vehicles);
+      iterator = vehicles.iterator();
+
+      while (iterator.hasNext()) {
+        Vehicle current = iterator.next();
+        System.out.println(current + ":" + current.noise());
+      }
+
+      // Push the pedal of a random vehicle. 
+      int randomPush = randomNumbers.nextInt(vehicles.size());
+      System.out.println("The pedal of " + vehicles.get(randomPush).toString() + " was pushed \n");
+      vehicles.get(randomPush).pushPedal();
+    } else {
+      errorMessage("Empty Street", "Nothing to simulate... Try creating some objects!");
+    }
   }
-  
+
+  /**
+   * Sort out the vehicles by fastest to slowest in terms of speed.
+   * 
+   * @author brandonandre
+   */
   public class VechicleComparator implements Comparator<Vehicle> {
 
-	@Override
-	public int compare(Vehicle v1, Vehicle v2) {
-		if(v1.getSpeed() < v2.getSpeed()){
-			return -1;
-		} else if(v1.getSpeed() > v2.getSpeed()){
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-	  
+    @Override
+    public int compare(Vehicle v1, Vehicle v2) {
+      if (v1.getSpeed() < v2.getSpeed()) {
+        return -1;
+      } else if (v1.getSpeed() > v2.getSpeed()) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
   }
-  
-  private Path browseFiles(boolean open){
-	  JFileChooser file = new JFileChooser();
-	  int result;
-	  file.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	  
-	  if (open){
-		  result = file.showOpenDialog(this);
-	  } else {
-		  result = file.showSaveDialog(this);
-	  }
-	  
-	  if (result != JFileChooser.CANCEL_OPTION)
-		  return file.getSelectedFile().toPath();
-	  
-	  return null; 
+
+  /**
+   * Opens up a file selector for the user to select a specific file from their computer. File
+   * selection mode is set to files only.
+   * 
+   * @param open If true show the open dialog. If false show the save dialog.
+   * @return the path that points where the user selected. Null is return if canceled or error.
+   */
+  private Path browseFiles(boolean open) {
+    JFileChooser file = new JFileChooser();
+    int result;
+    file.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+    // Check if it should save or open. Depending on what the user clicked.
+    if (open) {
+      result = file.showOpenDialog(this);
+    } else {
+      result = file.showSaveDialog(this);
+    }
+
+    if (result != JFileChooser.CANCEL_OPTION)
+      return file.getSelectedFile().toPath();
+
+    // User canceled the dialog or an error has occured. 
+    return null;
   }
-  
-  private void errorMessage(String title, String message){
-	  JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
+
+  /**
+   * Error message dialog to prompt the user something went wrong.
+   * 
+   * @param title Title at the top of the dialog.
+   * @param message Message shown within the dialog.
+   */
+  private void errorMessage(String title, String message) {
+    JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
   }
 
   public static void main(String[] args) {
     // Declare and create an instance of this class (Street).
     Street thestreet = new Street();
     thestreet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    thestreet.setSize(600, 150); // set frame size
+    thestreet.setSize(650, 150); // set frame size
     thestreet.setVisible(true);
   }
 }
